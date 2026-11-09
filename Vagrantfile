@@ -9,6 +9,8 @@ Vagrant.configure("2") do |config|
     web.vm.hostname = "web"
     web.vm.network "private_network", ip: "192.168.56.10"
     web.vm.network "forwarded_port", guest: 80, host: 8080
+    # Puerto SSH fijo para WEB
+    web.vm.network "forwarded_port", guest: 22, host: 2222, id: "ssh", auto_correct: true
     web.vm.provider "virtualbox" do |vb|
       vb.memory = 1024
       vb.cpus = 1
@@ -21,6 +23,8 @@ Vagrant.configure("2") do |config|
     erp.vm.hostname = "erp"
     erp.vm.network "private_network", ip: "192.168.56.11"
     erp.vm.network "forwarded_port", guest: 3000, host: 3000
+    # Puerto SSH fijo para ERP (evita colisión con web)
+    erp.vm.network "forwarded_port", guest: 22, host: 2201, id: "ssh", auto_correct: true
     erp.vm.provider "virtualbox" do |vb|
       vb.memory = 1536
       vb.cpus = 2
@@ -32,6 +36,8 @@ Vagrant.configure("2") do |config|
   config.vm.define "db" do |db|
     db.vm.hostname = "db"
     db.vm.network "private_network", ip: "192.168.56.12"
+    # Puerto SSH fijo para DB
+    db.vm.network "forwarded_port", guest: 22, host: 2202, id: "ssh", auto_correct: true
     db.vm.provider "virtualbox" do |vb|
       vb.memory = 1024
       vb.cpus = 1
@@ -44,10 +50,14 @@ Vagrant.configure("2") do |config|
     files.vm.hostname = "files"
     files.vm.network "private_network", ip: "192.168.56.13"
     files.vm.network "forwarded_port", guest: 8081, host: 8081
+    # Puerto SSH fijo para FILES
+    files.vm.network "forwarded_port", guest: 22, host: 2203, id: "ssh", auto_correct: true
     files.vm.provider "virtualbox" do |vb|
       vb.memory = 768
       vb.cpus = 1
     end
     files.vm.provision "shell", path: "provisioning/files.sh"
   end
+
+  config.vm.boot_timeout = 1200
 end
